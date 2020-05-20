@@ -76,4 +76,5 @@ def get_mfcc_feat(audio, feature_len=13, cep_lifter=22, sample_rate=16000, audio
     feats = np.log(feats)
     feats = dct(feats, type=2, axis=1, norm='ortho')[:, :feature_len]
     feats = lifter(feats, cep_lifter)
+    feats = np.abs(feats)
     return feats
