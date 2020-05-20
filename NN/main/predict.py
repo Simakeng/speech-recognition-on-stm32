@@ -1,12 +1,12 @@
 import importlib
 import os
+
 import NN.model
 import NN.utility
 
 from keras.models import load_model
-from keras.callbacks import ReduceLROnPlateau
-
-def train(data_set = None,data_per_batch=32,epoch=1,model_path='model.h5'):
+from keras.layers.core import K
+def predict(data_set = None,data_per_batch=32,epoch=1,model_path='model.h5'):
 
     Dataset = None
 
@@ -30,31 +30,30 @@ def train(data_set = None,data_per_batch=32,epoch=1,model_path='model.h5'):
         except Exception as ex:
             raise Exception('"%s" is not a vaild dataset!' % data_set)
 
-    data_loader = Dataset.DataLoader(1024,data_per_batch,13)
+    data_loader = Dataset.DataLoader(1024,1,13)
     
     # 加载网络模型
-    model = NN.model.create_model()
+    model = NN.model.create_pridict_model()
     # 输出网络结构
     model.summary()
     # 加载之前训练的数据
-    if(os.path.exists(model_path)):
-        model.load_weights(model_path)
+    model.load_weights(model_path)
+    # 验证集
+    validation_data = data_loader.get_validation_generator()
+    data = next(validation_data)[0]
+    r = model.predict(data['speech_data_input'])
+    r = K.ctc_decode(r,data['input_length'][0])
+    r1 = K.get_value(r[0][0])
+    r1 = r1[0]
 
-    # 日志记录器
-    csv_logger = NN.utility.LossHistory('training_log.csv')
-    # 数据随机器
-    radomizer = NN.utility.DataRadomizer(data_loader)
-    # 防止手贱
-    life_saver = NN.utility.ModelSaver(model,model_path,save_when_batch_end=True)
-    # 自动降低lr
-    reduce_lr = ReduceLROnPlateau('loss',verbose=1)
-    # 开始训练
-    res = model.fit_generator(
-        data_loader.get_train_generator(),
-        steps_per_epoch=1500,
-        epochs=epoch,
-        validation_data=data_loader.get_validation_generator(),
-        validation_steps=32,
-        callbacks=[csv_logger,radomizer,life_saver,reduce_lr])
+    tokens = NN.model.get_tokens()
 
-    model.save_weights(model_path)
+    print('predict: [',end='')
+    for i in r1:
+        print(tokens[i],end=', ')
+    print(']')
+    print('truth  : [',end='')
+    for i in range(data['label_length'][0][0]):
+        print(tokens[int(data['speech_labels'][0][i])],end=', ')
+    print(']')
+    pass

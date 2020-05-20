@@ -67,7 +67,7 @@ def lifter(cepstra, L=22):
         return cepstra
 
 
-def get_mfcc_feat(audio, feature_len=13, cep_lifter=22, sample_rate=16000, audio_window_length_ms=15, audio_window_delta_ms=10, pre_emph_coef=0.95, window_function=lambda x: x*0+1, NFFT=512, num_filters=20):
+def get_mfcc_feat(audio, feature_len=13, cep_lifter=22, sample_rate=16000, audio_window_length_ms=20, audio_window_delta_ms=15, pre_emph_coef=0.95, window_function=lambda x: x*0+1, NFFT=512, num_filters=20):
     audio = NN.feature.audio.pre_emphasis(audio, pre_emph_coef)
     frame = NN.feature.audio.get_frames(audio, sample_rate, audio_window_length_ms, audio_window_delta_ms)
     frame = NN.feature.audio.window(frame, window_function)

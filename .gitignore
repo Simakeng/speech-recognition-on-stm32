@@ -2,3 +2,6 @@
 \Dataset\*.py
 # python cache files
 **\__pycache__
+*.bin
+*.h5
+*.pyc

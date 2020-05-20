@@ -21,15 +21,19 @@ def get_tokens():
     return tokens
 
 
+cleas = [' ', '，', '。', '？', '！', ',', '.', '!', '?']
+
+
 def tokenize(s):
-    s = s.replace(' ','')
+    for c in cleas:
+        s = s.replace(c, '')
     tokens = get_tokens()
     letter_pinyins = pinyin(s, style=Style.TONE2, heteronym=False)
     result = []
     for p in letter_pinyins:
         p = p[0]
         while len(p) != 0:
-            if (len(p)>= 2) and(p[:2] in tokens):
+            if (len(p) >= 2) and(p[:2] in tokens):
                 result.append(p[:2])
                 p = p[2:]
             elif p[0] in tokens:
@@ -38,6 +42,7 @@ def tokenize(s):
             else:
                 raise Exception('illegal charater')
     return result
+
 
 def index_token(tokens):
     lt = get_tokens()

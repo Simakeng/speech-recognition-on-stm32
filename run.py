@@ -1,6 +1,4 @@
 import NN.main
 
-NN.main.train(epoch=10,data_per_batch=100)
-
-
-
+NN.main.train(epoch=30,data_per_batch=64)
+# NN.main.predict()
